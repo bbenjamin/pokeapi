@@ -249,3 +249,50 @@ Created by [**Paul Hallett**](https://github.com/phalt) and other [**PokéAPI co
         {"name": "utility"},
     ],
 }
+
+# Railway Production Configuration
+RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT')
+
+if RAILWAY_ENVIRONMENT:
+    import dj_database_url
+    print("🚂 Running on Railway - using production settings")
+
+    # Production settings override
+    DEBUG = False
+
+    # Railway provides these automatically
+    ALLOWED_HOSTS = [
+        '.railway.app',
+        '.up.railway.app',
+        'localhost',
+        '127.0.0.1'
+    ]
+
+    # Database configuration for Railway PostgreSQL
+    DATABASE_URL = os.environ.get('DATABASE_URL')
+    if DATABASE_URL:
+        DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
+        print(f"✅ Connected to Railway PostgreSQL database")
+
+    # Static files with WhiteNoise (add to beginning of middleware)
+    if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
+        MIDDLEWARE = ['whitenoise.middleware.WhiteNoiseMiddleware'] + list(MIDDLEWARE)
+
+    # Static files configuration
+    STATIC_URL = '/static/'
+    STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+    # Update CORS for Railway domains
+    CORS_ALLOWED_ORIGINS = [
+        "https://*.railway.app",
+        "https://*.up.railway.app",
+    ]
+    CORS_ALLOW_ALL_ORIGINS = True  # For educational purposes
+
+    # Security settings
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = False  # Railway handles this
+
+    print("🎓 Educational PokéAPI ready for Railway deployment!")
+
