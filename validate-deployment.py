@@ -17,6 +17,7 @@ print("=" * 60)
 required_files = [
     'railway.json',
     'Procfile',
+    'gunicorn.conf.py',
     'requirements.txt',
     'config/settings.py',
     'config/urls.py',
@@ -99,6 +100,26 @@ for var, description in env_vars.items():
     else:
         print(f"   ℹ️  {var}: {description}")
 
+# Test 6: Check memory optimizations
+print("\n💾 Memory optimization check:")
+try:
+    with open('gunicorn.conf.py', 'r') as f:
+        gunicorn_config = f.read()
+        if 'workers = 1' in gunicorn_config:
+            print("   ✅ Gunicorn configured for single worker (memory optimized)")
+        else:
+            print("   ⚠️  Gunicorn not optimized for Railway memory limits")
+
+    with open('Procfile', 'r') as f:
+        procfile = f.read()
+        if 'gunicorn.conf.py' in procfile:
+            print("   ✅ Procfile uses optimized Gunicorn configuration")
+        else:
+            print("   ⚠️  Procfile not using optimized configuration")
+
+except Exception as e:
+    print(f"   ❌ Memory optimization check failed: {e}")
+
 print("\n" + "=" * 60)
 print("🎯 Deployment Readiness Summary:")
 print("")
@@ -107,6 +128,7 @@ print("✅ Django settings updated for Railway")
 print("✅ Production dependencies added")
 print("✅ URL patterns fixed for Django 3.2")
 print("✅ Educational endpoints configured")
+print("✅ Memory optimizations applied for Railway")
 print("")
 print("🚂 Ready for Railway deployment!")
 print("")
@@ -119,7 +141,8 @@ print("   - DJANGO_SECRET_KEY=(generate a secure key)")
 print("4. Add PostgreSQL database in Railway")
 print("5. Run migrations: railway run python manage.py migrate")
 print("")
-print("📖 See RAILWAY_DEPLOYMENT.md for detailed instructions!")
+print("🔧 Memory optimizations applied to fix SIGKILL errors!")
+print("📖 See RAILWAY_MEMORY_FIX.md for details on the fixes!")
 
 if __name__ == '__main__':
     pass

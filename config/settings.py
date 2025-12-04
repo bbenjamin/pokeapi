@@ -272,7 +272,27 @@ if RAILWAY_ENVIRONMENT:
     DATABASE_URL = os.environ.get('DATABASE_URL')
     if DATABASE_URL:
         DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
+        # Optimize database connections for Railway's memory limits
+        DATABASES['default']['CONN_MAX_AGE'] = 60
+        DATABASES['default']['OPTIONS'] = {
+            'MAX_CONNS': 20,
+            'OPTIONS': {
+                'MAX_CONNS': 1
+            }
+        }
         print(f"✅ Connected to Railway PostgreSQL database")
+
+    # Memory optimizations for Railway
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+            'OPTIONS': {
+                'MAX_ENTRIES': 1000,  # Limit cache size
+                'CULL_FREQUENCY': 3,
+            }
+        }
+    }
 
     # Static files with WhiteNoise (add to beginning of middleware)
     if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
@@ -294,5 +314,43 @@ if RAILWAY_ENVIRONMENT:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = False  # Railway handles this
 
-    print("🎓 Educational PokéAPI ready for Railway deployment!")
+    # Memory optimizations for Railway's 1GB limit
+    DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+    # Disable admin in production to save memory
+    INSTALLED_APPS = tuple(app for app in INSTALLED_APPS if app != 'django.contrib.admin')
+
+    # Optimize logging to reduce memory usage
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'simple': {
+                'format': '{levelname} {message}',
+                'style': '{',
+            },
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'simple',
+            },
+        },
+        'root': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'WARNING',
+                'propagate': False,
+            },
+        },
+    }
+
+    # Disable migrations logging to save memory
+    MIGRATION_MODULES = {}
+
+    print("🎓 Educational PokéAPI optimized for Railway deployment!")
 
