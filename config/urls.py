@@ -7,7 +7,6 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 
 def api_root(request):
     """Root API endpoint with links to documentation and schema"""
-    from django.conf import settings
     import os
 
     # Check if we're on Railway
@@ -18,9 +17,7 @@ def api_root(request):
         'message': 'Welcome to Educational PokéAPI v2 🎓',
         'status': 'healthy',
         'environment': 'Railway' if is_railway else 'Local',
-        'debug': settings.DEBUG,
-        'database_connected': bool(database_url),
-        'setup_required': not database_url if is_railway else False,
+        'database_configured': bool(database_url),
         'documentation': {
             'swagger_ui': request.build_absolute_uri('/api/v2/schema/swagger-ui/'),
             'redoc': request.build_absolute_uri('/api/v2/schema/redoc/'),
@@ -49,10 +46,13 @@ def api_root(request):
     })
 
 def health_check(request):
-    """Simple health check for Railway"""
+    """Simple health check for Railway - no database dependencies"""
+    import os
     return JsonResponse({
-        'status': 'ok',
-        'service': 'educational-pokeapi'
+        'status': 'healthy',
+        'service': 'educational-pokeapi',
+        'environment': 'railway' if os.environ.get('RAILWAY_ENVIRONMENT') else 'local',
+        'timestamp': str(__import__('datetime').datetime.now())
     })
 
 urlpatterns = [
