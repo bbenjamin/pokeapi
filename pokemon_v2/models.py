@@ -956,12 +956,13 @@ class BerryFirmnessName(IsName):
 
 
 class Berry(HasName, HasItem):
-    berry_firmness = models.ForeignKey(
+    firmness = models.ForeignKey(
         BerryFirmness,
         blank=True,
         null=True,
         related_name="%(class)s",
         on_delete=models.CASCADE,
+        db_column='firmness_id'
     )
 
     natural_gift_power = models.IntegerField()

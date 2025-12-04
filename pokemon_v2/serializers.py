@@ -2257,7 +2257,7 @@ class BerryFlavorDetailSerializer(serializers.ModelSerializer):
 class BerryDetailSerializer(serializers.ModelSerializer):
     item = ItemSummarySerializer()
     natural_gift_type = TypeSummarySerializer()
-    firmness = BerryFirmnessSummarySerializer(source="berry_firmness")
+    firmness = BerryFirmnessSummarySerializer(source="firmness")
     flavors = serializers.SerializerMethodField("get_berry_flavors")
 
     class Meta:
