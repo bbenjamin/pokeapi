@@ -2,9 +2,10 @@
 """
 Quick fix for missing pokemon_v2_berryflavormap table
 """
+import os
 import psycopg2
 
-DATABASE_URL = "postgresql://postgres:kmoVkYPUByqWiiBKNXAHCBCOuzMkQnGx@maglev.proxy.rlwy.net:39520/railway"
+DATABASE_URL = os.environ.get('DATABASE_URL') or input("Enter your Railway DATABASE_URL: ").strip()
 
 try:
     conn = psycopg2.connect(DATABASE_URL)

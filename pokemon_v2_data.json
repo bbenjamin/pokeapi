@@ -1,0 +1,7 @@
+💻 Using local PostgreSQL database
+🔍 Environment check:
+   DATABASE_URL exists: False
+   RAILWAY_ENVIRONMENT: None
+   PORT: None
+⚠️  Railway not detected - using local configuration
+[

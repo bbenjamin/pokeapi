@@ -351,11 +351,10 @@ def migrate_database_schema(db_url):
         ]
 
         for type_id, name in basic_types:
-            cur.execute("""
-            INSERT INTO pokemon_v2_type (id, name) 
-            VALUES (%s, %s) 
-            ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
-            """, (type_id, name))
+            # Check if type already exists before inserting
+            cur.execute("SELECT id FROM pokemon_v2_type WHERE id = %s", (type_id,))
+            if not cur.fetchone():
+                cur.execute("INSERT INTO pokemon_v2_type (id, name) VALUES (%s, %s)", (type_id, name))
 
         # Ensure we have basic abilities
         basic_abilities = [
@@ -365,11 +364,10 @@ def migrate_database_schema(db_url):
         ]
 
         for ability_id, name in basic_abilities:
-            cur.execute("""
-            INSERT INTO pokemon_v2_ability (id, name) 
-            VALUES (%s, %s) 
-            ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
-            """, (ability_id, name))
+            # Check if ability already exists before inserting
+            cur.execute("SELECT id FROM pokemon_v2_ability WHERE id = %s", (ability_id,))
+            if not cur.fetchone():
+                cur.execute("INSERT INTO pokemon_v2_ability (id, name) VALUES (%s, %s)", (ability_id, name))
 
         # Add Django migration records
         cur.execute("""

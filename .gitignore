@@ -8,6 +8,20 @@ db.*
 node_modules
 .vscode
 *.env
+.env.local
+.env.production
+DATABASE_URL.txt
+*credentials*
+*secrets*
 Resources/nginx/ssl/*
 !Resources/nginx/ssl/*.sample.*
 .idea*
+auto_migrate_schema.py
+quick_berry_fix.py
+
+# Database dumps (may contain sensitive data)
+*.sql
+*.dump
+*_backup.json
+*_export.json
+
