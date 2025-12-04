@@ -60,17 +60,31 @@ ROOT_URLCONF = "config.urls"
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "pokeapi_co_db",
-        "USER": "root",
-        "PASSWORD": "pokeapi",
-        "HOST": "localhost",
-        "PORT": "",
-        "CONN_MAX_AGE": 30,
+# Database Configuration
+# Check for Railway DATABASE_URL first, then fallback to local
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Railway PostgreSQL configuration
+    import dj_database_url
+    DATABASES = {
+        "default": dj_database_url.parse(DATABASE_URL)
     }
-}
+    print(f"🚂 Using Railway PostgreSQL database")
+else:
+    # Local development database
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": "pokeapi_co_db",
+            "USER": "root",
+            "PASSWORD": "pokeapi",
+            "HOST": "localhost",
+            "PORT": "",
+            "CONN_MAX_AGE": 30,
+        }
+    }
+    print(f"💻 Using local PostgreSQL database")
 
 CACHES = {
     "default": {
@@ -253,9 +267,13 @@ Created by [**Paul Hallett**](https://github.com/phalt) and other [**PokéAPI co
 # Railway Production Configuration
 RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT')
 
-if RAILWAY_ENVIRONMENT:
-    import dj_database_url
-    print("🚂 Running on Railway - using production settings")
+print(f"🔍 Environment check:")
+print(f"   DATABASE_URL exists: {bool(DATABASE_URL)}")
+print(f"   RAILWAY_ENVIRONMENT: {RAILWAY_ENVIRONMENT}")
+
+# If DATABASE_URL exists (Railway detected), apply production settings
+if DATABASE_URL:
+    print("🚂 Railway detected - applying production settings")
 
     # Production settings override
     DEBUG = False
@@ -268,19 +286,20 @@ if RAILWAY_ENVIRONMENT:
         '127.0.0.1'
     ]
 
-    # Database configuration for Railway PostgreSQL
-    DATABASE_URL = os.environ.get('DATABASE_URL')
-    if DATABASE_URL:
-        DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
-        # Optimize database connections for Railway's memory limits
-        DATABASES['default']['CONN_MAX_AGE'] = 60
-        DATABASES['default']['OPTIONS'] = {
-            'MAX_CONNS': 20,
-            'OPTIONS': {
-                'MAX_CONNS': 1
-            }
-        }
-        print(f"✅ Connected to Railway PostgreSQL database")
+    # Optimize database connections for Railway's memory limits
+    DATABASES['default']['CONN_MAX_AGE'] = 60
+    DATABASES['default']['OPTIONS'] = {
+        'MAX_CONNS': 1
+    }
+
+    print(f"✅ Railway configuration applied:")
+    print(f"   Host: {DATABASES['default']['HOST']}")
+    print(f"   Port: {DATABASES['default']['PORT']}")
+    print(f"   Database: {DATABASES['default']['NAME']}")
+    print(f"   User: {DATABASES['default']['USER']}")
+else:
+    print("⚠️  Railway not detected - using local configuration")
+    print("   Make sure PostgreSQL service is added in Railway dashboard")
 
     # Memory optimizations for Railway
     CACHES = {
