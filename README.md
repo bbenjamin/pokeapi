@@ -3,12 +3,7 @@
 <div align="center">
 	<img height="200" src="https://raw.githubusercontent.com/PokeAPI/media/master/logo/pokeapi.svg?sanitize=true" alt="PokeAPI">
 
-[![build status](https://img.shields.io/circleci/project/github/PokeAPI/pokeapi/master.svg)](https://circleci.com/gh/PokeAPI/pokeapi)
-[![data status](https://img.shields.io/circleci/build/github/PokeAPI/api-data?label=data)](https://github.com/PokeAPI/api-data)
-[![deploy status](https://img.shields.io/circleci/build/github/PokeAPI/deploy?label=deploy)](https://github.com/PokeAPI/deploy)
 [![License](https://img.shields.io/github/license/PokeAPI/pokeapi.svg)](https://github.com/PokeAPI/pokeapi/blob/master/LICENSE.md)
-[![Backers on Open Collective](https://opencollective.com/pokeapi/backers/badge.svg)](https://opencollective.com/pokeapi)
-[![Sponsors on Open Collective](https://opencollective.com/pokeapi/sponsors/badge.svg)](https://opencollective.com/pokeapi)
 
 <br/>
 
@@ -16,9 +11,54 @@
 
 <br/>
 
-A RESTful API for Pokémon - [pokeapi.co](https://pokeapi.co)
+# 🎓 Educational PokéAPI - Writable REST API for Learning
 
-> Beta GraphQL support is rolling out! Check out the [GraphQL paragraph](#graphql--) for more info.
+**A modified version of PokéAPI with full CRUD operations for educational purposes**
+
+This is an enhanced version of the popular [PokéAPI](https://pokeapi.co) that includes **writable endpoints** for teaching REST API concepts. Students can practice all HTTP methods (GET, POST, PUT, PATCH, DELETE) with interactive Pokemon data.
+
+## ✨ **Educational Features**
+
+- 🔄 **Full CRUD Operations** - Create, Read, Update, Delete Pokemon data
+- 📚 **Interactive Documentation** - Swagger UI for hands-on API testing  
+- 🎯 **Teaching-Focused** - Sample data perfect for learning REST concepts
+- 🚀 **Railway Deployment** - Easy cloud hosting for classroom access
+- 🌐 **CORS Enabled** - Ready for frontend development exercises
+
+## 🚀 **Live Demo**
+
+**Deployed Instance:** [https://pokeapi-production-2219.up.railway.app/](https://pokeapi-production-2219.up.railway.app/)
+
+**Interactive API Documentation:** [https://pokeapi-production-2219.up.railway.app/api/v2/schema/swagger-ui/](https://pokeapi-production-2219.up.railway.app/api/v2/schema/swagger-ui/)
+
+## 📖 **Educational Endpoints**
+
+| Endpoint | Methods | Purpose |
+|----------|---------|---------|
+| `/api/v2/writable-pokemon/` | GET, POST, PUT, PATCH, DELETE | Practice Pokemon CRUD operations |
+| `/api/v2/writable-ability/` | GET, POST, PUT, PATCH, DELETE | Learn with Pokemon abilities |
+| `/api/v2/writable-type/` | GET, POST, PUT, PATCH, DELETE | Explore Pokemon type system |
+| `/api/v2/writable-berry/` | GET, POST, PUT, PATCH, DELETE | Work with Pokemon berries |
+
+## 🎯 **Quick Start for Students**
+
+```bash
+# List all Pokemon
+curl https://pokeapi-production-2219.up.railway.app/api/v2/writable-pokemon/
+
+# Get specific Pokemon
+curl https://pokeapi-production-2219.up.railway.app/api/v2/writable-pokemon/1/
+
+# Create new Pokemon (POST)
+curl -X POST https://pokeapi-production-2219.up.railway.app/api/v2/writable-pokemon/ \
+     -H "Content-Type: application/json" \
+     -d '{"name": "student-pokemon", "height": 10, "weight": 100}'
+
+# Update Pokemon (PUT)
+curl -X PUT https://pokeapi-production-2219.up.railway.app/api/v2/writable-pokemon/1/ \
+     -H "Content-Type: application/json" \
+     -d '{"name": "updated-pokemon", "height": 15, "weight": 150}'
+```
 
 
 ## Table of Contents

@@ -86,13 +86,15 @@ else:
     }
     print(f"💻 Using local PostgreSQL database")
 
+# Cache Configuration - Railway compatible (no Redis dependency)
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "default-cache",
         "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
+            "MAX_ENTRIES": 1000,
+            "CULL_FREQUENCY": 3,
+        }
     }
 }
 
@@ -320,17 +322,7 @@ if IS_RAILWAY:
 else:
     print("⚠️  Railway not detected - using local configuration")
 
-    # Memory optimizations for Railway
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'unique-snowflake',
-            'OPTIONS': {
-                'MAX_ENTRIES': 1000,  # Limit cache size
-                'CULL_FREQUENCY': 3,
-            }
-        }
-    }
+    # Cache configuration already set above to be Railway compatible
 
     # Static files with WhiteNoise (add to beginning of middleware)
     if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
