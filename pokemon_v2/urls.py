@@ -62,6 +62,12 @@ router.register(r"type", TypeResource)
 router.register(r"version", VersionResource)
 router.register(r"version-group", VersionGroupResource)
 
+# Educational writable endpoints
+router.register(r"writable-pokemon", WritablePokemonResource)
+router.register(r"writable-berry", WritableBerryResource)
+router.register(r"writable-ability", WritableAbilityResource)
+router.register(r"writable-type", WritableTypeResource)
+
 
 ###########################
 #

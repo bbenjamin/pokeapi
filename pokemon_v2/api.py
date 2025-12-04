@@ -99,6 +99,31 @@ class PokeapiCommonViewset(
     pass
 
 
+@extend_schema_view(list=extend_schema(parameters=[q_query_string_parameter]))
+class PokeapiWritableViewset(
+    ListOrDetailSerialRelation, NameOrIdRetrieval, viewsets.ModelViewSet
+):
+    """
+    Writable ViewSet for educational purposes.
+    Supports GET, POST, PUT, PATCH, DELETE operations.
+    """
+    @extend_schema(parameters=[retrieve_path_parameter])
+    def retrieve(self, request, pk=None):
+        return super().retrieve(request, pk)
+
+    def perform_create(self, serializer):
+        """Custom create logic if needed"""
+        serializer.save()
+
+    def perform_update(self, serializer):
+        """Custom update logic if needed"""
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        """Custom delete logic if needed"""
+        instance.delete()
+
+
 ##########
 #  APIS  #
 ##########
@@ -1059,3 +1084,136 @@ class PokemonEncounterView(APIView):
             )
 
         return Response(encounters_list)
+
+
+##################################
+#  WRITABLE APIS FOR EDUCATION   #
+##################################
+
+@extend_schema(
+    description="**EDUCATIONAL VERSION** - Writable Pokémon resource that supports GET, POST, PUT, PATCH, DELETE operations. This is for teaching REST API concepts.",
+    summary="Manage pokemon (Educational)",
+    tags=["pokemon-writable"],
+)
+@extend_schema_view(
+    list=extend_schema(
+        summary="List pokemon (writable version)",
+    ),
+    create=extend_schema(
+        summary="Create new pokemon",
+    ),
+    update=extend_schema(
+        summary="Update pokemon",
+    ),
+    partial_update=extend_schema(
+        summary="Partially update pokemon",
+    ),
+    destroy=extend_schema(
+        summary="Delete pokemon",
+    ),
+)
+class WritablePokemonResource(PokeapiWritableViewset):
+    """
+    Educational writable Pokemon resource.
+    Supports all CRUD operations for teaching purposes.
+    """
+    queryset = Pokemon.objects.all()
+    serializer_class = PokemonDetailSerializer
+    list_serializer_class = PokemonSummarySerializer
+
+
+@extend_schema(
+    description="**EDUCATIONAL VERSION** - Writable Berry resource that supports GET, POST, PUT, PATCH, DELETE operations. Berries are small fruits that can provide various effects when consumed by Pokémon.",
+    summary="Manage berries (Educational)",
+    tags=["berries-writable"],
+)
+@extend_schema_view(
+    list=extend_schema(
+        summary="List berries (writable version)",
+    ),
+    create=extend_schema(
+        summary="Create new berry",
+    ),
+    update=extend_schema(
+        summary="Update berry",
+    ),
+    partial_update=extend_schema(
+        summary="Partially update berry",
+    ),
+    destroy=extend_schema(
+        summary="Delete berry",
+    ),
+)
+class WritableBerryResource(PokeapiWritableViewset):
+    """
+    Educational writable Berry resource.
+    Supports all CRUD operations for teaching purposes.
+    """
+    queryset = Berry.objects.all()
+    serializer_class = BerryDetailSerializer
+    list_serializer_class = BerrySummarySerializer
+
+
+@extend_schema(
+    description="**EDUCATIONAL VERSION** - Writable Ability resource that supports GET, POST, PUT, PATCH, DELETE operations. Abilities provide passive effects for Pokémon in battle or in the overworld.",
+    summary="Manage abilities (Educational)",
+    tags=["pokemon-writable"],
+)
+@extend_schema_view(
+    list=extend_schema(
+        summary="List abilities (writable version)",
+    ),
+    create=extend_schema(
+        summary="Create new ability",
+    ),
+    update=extend_schema(
+        summary="Update ability",
+    ),
+    partial_update=extend_schema(
+        summary="Partially update ability",
+    ),
+    destroy=extend_schema(
+        summary="Delete ability",
+    ),
+)
+class WritableAbilityResource(PokeapiWritableViewset):
+    """
+    Educational writable Ability resource.
+    Supports all CRUD operations for teaching purposes.
+    """
+    queryset = Ability.objects.all()
+    serializer_class = AbilityDetailSerializer
+    list_serializer_class = AbilitySummarySerializer
+
+
+@extend_schema(
+    description="**EDUCATIONAL VERSION** - Writable Type resource that supports GET, POST, PUT, PATCH, DELETE operations. Types are properties for Pokémon and their moves.",
+    summary="Manage types (Educational)",
+    tags=["pokemon-writable"],
+)
+@extend_schema_view(
+    list=extend_schema(
+        summary="List types (writable version)",
+    ),
+    create=extend_schema(
+        summary="Create new type",
+    ),
+    update=extend_schema(
+        summary="Update type",
+    ),
+    partial_update=extend_schema(
+        summary="Partially update type",
+    ),
+    destroy=extend_schema(
+        summary="Delete type",
+    ),
+)
+class WritableTypeResource(PokeapiWritableViewset):
+    """
+    Educational writable Type resource.
+    Supports all CRUD operations for teaching purposes.
+    """
+    queryset = Type.objects.all()
+    serializer_class = TypeDetailSerializer
+    list_serializer_class = TypeSummarySerializer
+
