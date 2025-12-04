@@ -295,9 +295,9 @@ if IS_RAILWAY:
     if DATABASE_URL:
         # Optimize database connections for Railway's memory limits
         DATABASES['default']['CONN_MAX_AGE'] = 60
-        DATABASES['default']['OPTIONS'] = {
-            'MAX_CONNS': 1
-        }
+        # Remove invalid MAX_CONNS option - not a valid PostgreSQL parameter
+        DATABASES['default']['OPTIONS'] = {}
+
         print(f"✅ Railway PostgreSQL configuration:")
         print(f"   Host: {DATABASES['default']['HOST']}")
         print(f"   Port: {DATABASES['default']['PORT']}")
