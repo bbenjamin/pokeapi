@@ -163,32 +163,70 @@ TEMPLATES = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+# Determine the correct server URL based on environment
+if DATABASE_URL and 'railway' in DATABASE_URL:
+    # Railway production environment
+    API_SERVER_URL = "https://pokeapi-production-2219.up.railway.app"
+    DOCS_URL = "https://pokeapi-production-2219.up.railway.app/api/v2/schema/swagger-ui/"
+else:
+    # Local development or original
+    API_SERVER_URL = "http://localhost:8000" if DEBUG else "https://pokeapi.co"
+    DOCS_URL = "https://pokeapi.co/docs/v2"
+
 SPECTACULAR_SETTINGS = {
-    "TITLE": "PokéAPI",
-    "DESCRIPTION": """All the Pokémon data you'll ever need in one place, easily accessible through a modern free open-source RESTful API.
+    "TITLE": "🎓 Educational PokéAPI - Writable REST API",
+    "DESCRIPTION": """**Educational version of PokéAPI with full CRUD operations for learning REST API concepts**
 
 ## What is this?
 
-This is a full RESTful API linked to an extensive database detailing everything about the Pokémon main game series.
+This is an enhanced version of the popular PokéAPI that includes **writable endpoints** for teaching REST API concepts. Students can practice all HTTP methods (GET, POST, PUT, PATCH, DELETE) with interactive Pokemon data.
 
-We've covered everything from Pokémon to Berry Flavors.
+## Educational Features
 
-## Where do I start?
+- 🔄 **Full CRUD Operations** - Create, Read, Update, Delete Pokemon data
+- 📚 **Interactive Documentation** - Hands-on API testing with Swagger UI
+- 🎯 **Teaching-Focused** - Sample data perfect for learning REST concepts  
+- 🌐 **CORS Enabled** - Ready for frontend development exercises
 
-We have awesome [documentation](https://pokeapi.co/docs/v2) on how to use this API. It takes minutes to get started.
+## Educational Endpoints
 
-This API will always be publicly available and will never require any extensive setup process to consume.
+- `/api/v2/writable-pokemon/` - Practice Pokemon CRUD operations
+- `/api/v2/writable-ability/` - Learn with Pokemon abilities  
+- `/api/v2/writable-type/` - Explore Pokemon type system
+- `/api/v2/writable-berry/` - Work with Pokemon berries
 
-Created by [**Paul Hallett**](https://github.com/phalt) and other [**PokéAPI contributors***](https://github.com/PokeAPI/pokeapi#contributing) around the world. Pokémon and Pokémon character names are trademarks of Nintendo.
+## Original PokéAPI
+
+Based on the amazing [PokéAPI](https://pokeapi.co) created by [**Paul Hallett**](https://github.com/phalt) and [**contributors**](https://github.com/PokeAPI/pokeapi#contributing). Pokémon and Pokémon character names are trademarks of Nintendo.
     """,
     "SORT_OPERATIONS": False,
-    "SERVERS": [{"url": "https://pokeapi.co"}],
-    "EXTERNAL_DOCS": {"url": "https://pokeapi.co/docs/v2"},
+    "SERVERS": [{"url": API_SERVER_URL, "description": "Educational PokéAPI Server"}],
+    "EXTERNAL_DOCS": {"url": DOCS_URL, "description": "API Documentation"},
     "VERSION": "2.7.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "OAS_VERSION": "3.1.0",
     "COMPONENT_SPLIT_REQUEST": True,
     "TAGS": [
+        {
+            "name": "pokemon-writable",
+            "description": "🎓 **Educational CRUD Operations** - Create, read, update, and delete Pokemon for hands-on REST API learning. Practice all HTTP methods with interactive Pokemon data.",
+            "externalDocs": {
+                "description": "Learn REST API concepts",
+                "url": "https://restfulapi.net/",
+            },
+        },
+        {
+            "name": "berries-writable",
+            "description": "🫐 **Educational Berry Management** - Practice CRUD operations with Pokemon berries. Perfect for learning REST API patterns and JSON handling.",
+        },
+        {
+            "name": "abilities-writable",
+            "description": "💪 **Educational Ability System** - Learn API design by managing Pokemon abilities. Full create, read, update, delete functionality for educational purposes.",
+        },
+        {
+            "name": "types-writable",
+            "description": "🏷️ **Educational Type System** - Explore REST concepts through Pokemon type management. Complete CRUD operations available for learning.",
+        },
         {
             "name": "pokemon",
             "description": "Pokémon are the creatures that inhabit the world of the Pokémon games. They can be caught using Pokéballs and trained by battling with other Pokémon. Each Pokémon belongs to a specific species but may take on a variant which makes it differ from other Pokémon of the same species, such as base stats, available abilities and typings. See [Bulbapedia](http://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_(species)) for greater detail.",
@@ -319,11 +357,6 @@ if IS_RAILWAY:
             }
         }
         print("   Using temporary SQLite database until PostgreSQL is connected")
-else:
-    print("⚠️  Railway not detected - using local configuration")
-
-    # Cache configuration already set above to be Railway compatible
-
     # Static files with WhiteNoise (add to beginning of middleware)
     if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
         MIDDLEWARE = ['whitenoise.middleware.WhiteNoiseMiddleware'] + list(MIDDLEWARE)
@@ -387,4 +420,6 @@ else:
     MIGRATION_MODULES = {}
 
     print("🎓 Educational PokéAPI optimized for Railway deployment!")
+else:
+    print("⚠️  Railway not detected - using local configuration")
 
