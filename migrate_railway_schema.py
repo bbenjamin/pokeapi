@@ -273,7 +273,7 @@ def migrate_database_schema(db_url):
                 cur.execute("""
                 INSERT INTO pokemon_v2_type (id, name) 
                 VALUES (%s, %s) 
-                ON CONFLICT (name) DO NOTHING;
+                ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
                 """, (type_id, name))
             print(f"   ✅ Restored {len(existing_data['types'])} types")
 
@@ -283,7 +283,7 @@ def migrate_database_schema(db_url):
                 cur.execute("""
                 INSERT INTO pokemon_v2_ability (id, name) 
                 VALUES (%s, %s) 
-                ON CONFLICT (name) DO NOTHING;
+                ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
                 """, (ability_id, name))
             print(f"   ✅ Restored {len(existing_data['abilities'])} abilities")
 
@@ -294,14 +294,18 @@ def migrate_database_schema(db_url):
                 cur.execute("""
                 INSERT INTO pokemon_v2_pokemonspecies (id, name) 
                 VALUES (%s, %s) 
-                ON CONFLICT (name) DO NOTHING;
+                ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
                 """, (pokemon_id, name))
 
                 # Create pokemon
                 cur.execute("""
                 INSERT INTO pokemon_v2_pokemon (id, name, pokemon_species_id, height, weight, base_experience) 
                 VALUES (%s, %s, %s, %s, %s, %s) 
-                ON CONFLICT (name) DO NOTHING;
+                ON CONFLICT (id) DO UPDATE SET 
+                    name = EXCLUDED.name,
+                    height = EXCLUDED.height,
+                    weight = EXCLUDED.weight,
+                    base_experience = EXCLUDED.base_experience;
                 """, (pokemon_id, name, pokemon_id, height, weight, base_experience))
             print(f"   ✅ Restored {len(existing_data['pokemon'])} pokemon with species")
 
@@ -312,7 +316,7 @@ def migrate_database_schema(db_url):
                 cur.execute("""
                 INSERT INTO pokemon_v2_item (id, name, item_category_id, cost) 
                 VALUES (%s, %s, 1, 20) 
-                ON CONFLICT (name) DO NOTHING;
+                ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
                 """, (berry_id, f"{name}-berry"))
 
                 # Get a random type for natural gift (or create if needed)
@@ -326,7 +330,11 @@ def migrate_database_schema(db_url):
                 (id, name, item_id, berry_firmness_id, natural_gift_power, natural_gift_type_id, 
                  size, max_harvest, growth_time, soil_dryness, smoothness) 
                 VALUES (%s, %s, %s, 2, 60, %s, %s, %s, %s, 15, 25) 
-                ON CONFLICT (name) DO NOTHING;
+                ON CONFLICT (id) DO UPDATE SET 
+                    name = EXCLUDED.name,
+                    size = EXCLUDED.size,
+                    max_harvest = EXCLUDED.max_harvest,
+                    growth_time = EXCLUDED.growth_time;
                 """, (berry_id, name, berry_id, natural_gift_type_id, size, max_harvest, growth_time))
             print(f"   ✅ Restored {len(existing_data['berries'])} berries with full relationships")
 
@@ -346,7 +354,7 @@ def migrate_database_schema(db_url):
             cur.execute("""
             INSERT INTO pokemon_v2_type (id, name) 
             VALUES (%s, %s) 
-            ON CONFLICT (name) DO NOTHING;
+            ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
             """, (type_id, name))
 
         # Ensure we have basic abilities
@@ -360,14 +368,14 @@ def migrate_database_schema(db_url):
             cur.execute("""
             INSERT INTO pokemon_v2_ability (id, name) 
             VALUES (%s, %s) 
-            ON CONFLICT (name) DO NOTHING;
+            ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
             """, (ability_id, name))
 
         # Add Django migration records
         cur.execute("""
         INSERT INTO django_migrations (app, name, applied) 
         VALUES ('pokemon_v2', '0001_initial', NOW()) 
-        ON CONFLICT DO NOTHING;
+        ON CONFLICT (app, name) DO NOTHING;
         """)
 
         # Commit transaction
