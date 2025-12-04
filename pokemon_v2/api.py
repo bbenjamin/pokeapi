@@ -1116,10 +1116,17 @@ class WritablePokemonResource(PokeapiWritableViewset):
     """
     Educational writable Pokemon resource.
     Supports all CRUD operations for teaching purposes.
+    Uses different serializers for read vs write operations to support partial updates.
     """
     queryset = Pokemon.objects.all()
     serializer_class = PokemonDetailSerializer
     list_serializer_class = PokemonSummarySerializer
+
+    def get_serializer_class(self):
+        """Use writable serializer for create/update operations."""
+        if self.action in ['create', 'update', 'partial_update']:
+            return WritablePokemonSerializer
+        return super().get_serializer_class()
 
 
 @extend_schema(
@@ -1148,10 +1155,21 @@ class WritableBerryResource(PokeapiWritableViewset):
     """
     Educational writable Berry resource.
     Supports all CRUD operations for teaching purposes.
+    Uses different serializers for read vs write operations to support partial updates.
     """
     queryset = Berry.objects.all()
-    serializer_class = BerryDetailSerializer
-    list_serializer_class = BerrySummarySerializer
+    serializer_class = BerryDetailSerializer  # For GET requests (detailed view)
+    list_serializer_class = BerrySummarySerializer  # For GET list requests
+
+    def get_serializer_class(self):
+        """
+        Return appropriate serializer based on action.
+        - GET requests: Use detailed serializer with nested relationships
+        - POST/PUT/PATCH requests: Use writable serializer for partial updates
+        """
+        if self.action in ['create', 'update', 'partial_update']:
+            return WritableBerrySerializer
+        return super().get_serializer_class()
 
 
 @extend_schema(
@@ -1180,10 +1198,17 @@ class WritableAbilityResource(PokeapiWritableViewset):
     """
     Educational writable Ability resource.
     Supports all CRUD operations for teaching purposes.
+    Uses different serializers for read vs write operations to support partial updates.
     """
     queryset = Ability.objects.all()
     serializer_class = AbilityDetailSerializer
     list_serializer_class = AbilitySummarySerializer
+
+    def get_serializer_class(self):
+        """Use writable serializer for create/update operations."""
+        if self.action in ['create', 'update', 'partial_update']:
+            return WritableAbilitySerializer
+        return super().get_serializer_class()
 
 
 @extend_schema(
@@ -1212,8 +1237,15 @@ class WritableTypeResource(PokeapiWritableViewset):
     """
     Educational writable Type resource.
     Supports all CRUD operations for teaching purposes.
+    Uses different serializers for read vs write operations to support partial updates.
     """
     queryset = Type.objects.all()
     serializer_class = TypeDetailSerializer
     list_serializer_class = TypeSummarySerializer
+
+    def get_serializer_class(self):
+        """Use writable serializer for create/update operations."""
+        if self.action in ['create', 'update', 'partial_update']:
+            return WritableTypeSerializer
+        return super().get_serializer_class()
 

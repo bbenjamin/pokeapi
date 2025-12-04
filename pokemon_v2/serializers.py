@@ -2322,6 +2322,166 @@ class BerryDetailSerializer(serializers.ModelSerializer):
         return flavors
 
 
+class WritableBerrySerializer(serializers.ModelSerializer):
+    """
+    Writable Berry serializer for educational CRUD operations.
+    Supports partial updates and handles foreign key fields properly.
+    """
+    # Use ID fields for foreign keys to make updates easier
+    berry_firmness_id = serializers.IntegerField(required=False, allow_null=True)
+    natural_gift_type_id = serializers.IntegerField(required=False, allow_null=True)
+    item_id = serializers.IntegerField(required=False, allow_null=True)
+
+    class Meta:
+        model = Berry
+        fields = (
+            "id",
+            "name",
+            "growth_time",
+            "max_harvest",
+            "natural_gift_power",
+            "size",
+            "smoothness",
+            "soil_dryness",
+            "berry_firmness_id",
+            "natural_gift_type_id",
+            "item_id",
+        )
+        extra_kwargs = {
+            # Make all fields optional for partial updates
+            'name': {'required': False},
+            'growth_time': {'required': False},
+            'max_harvest': {'required': False},
+            'natural_gift_power': {'required': False},
+            'size': {'required': False},
+            'smoothness': {'required': False},
+            'soil_dryness': {'required': False},
+        }
+
+    def update(self, instance, validated_data):
+        """
+        Update only the fields that are provided in the request.
+        This allows partial updates where missing fields keep their original values.
+        """
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        instance.save()
+        return instance
+
+    def create(self, validated_data):
+        """
+        Create a new berry with provided data.
+        Set default values for any missing required fields.
+        """
+        # Set defaults for required fields if not provided
+        defaults = {
+            'growth_time': 3,
+            'max_harvest': 5,
+            'natural_gift_power': 60,
+            'size': 20,
+            'smoothness': 25,
+            'soil_dryness': 15,
+        }
+
+        for field, default_value in defaults.items():
+            if field not in validated_data:
+                validated_data[field] = default_value
+
+        return super().create(validated_data)
+
+
+class WritablePokemonSerializer(serializers.ModelSerializer):
+    """
+    Writable Pokemon serializer for educational CRUD operations.
+    Supports partial updates with simplified field handling.
+    """
+    pokemon_species_id = serializers.IntegerField(required=False, allow_null=True)
+
+    class Meta:
+        model = Pokemon
+        fields = (
+            "id",
+            "name",
+            "base_experience",
+            "height",
+            "weight",
+            "is_default",
+            "order",
+            "pokemon_species_id",
+        )
+        extra_kwargs = {
+            'name': {'required': False},
+            'base_experience': {'required': False},
+            'height': {'required': False},
+            'weight': {'required': False},
+            'is_default': {'required': False},
+            'order': {'required': False},
+        }
+
+    def update(self, instance, validated_data):
+        """Update only provided fields."""
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        instance.save()
+        return instance
+
+
+class WritableAbilitySerializer(serializers.ModelSerializer):
+    """
+    Writable Ability serializer for educational CRUD operations.
+    Supports partial updates.
+    """
+    generation_id = serializers.IntegerField(required=False, allow_null=True)
+
+    class Meta:
+        model = Ability
+        fields = (
+            "id",
+            "name",
+            "is_main_series",
+            "generation_id",
+        )
+        extra_kwargs = {
+            'name': {'required': False},
+            'is_main_series': {'required': False},
+        }
+
+    def update(self, instance, validated_data):
+        """Update only provided fields."""
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        instance.save()
+        return instance
+
+
+class WritableTypeSerializer(serializers.ModelSerializer):
+    """
+    Writable Type serializer for educational CRUD operations.
+    Supports partial updates.
+    """
+    generation_id = serializers.IntegerField(required=False, allow_null=True)
+    move_damage_class_id = serializers.IntegerField(required=False, allow_null=True)
+
+    class Meta:
+        model = Type
+        fields = (
+            "id",
+            "name",
+            "generation_id",
+            "move_damage_class_id",
+        )
+        extra_kwargs = {
+            'name': {'required': False},
+        }
+
+    def update(self, instance, validated_data):
+        """Update only provided fields."""
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        instance.save()
+        return instance
+
+
 ###########################
 #  EGG GROUP SERIALIZERS  #
 ###########################
