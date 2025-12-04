@@ -266,13 +266,17 @@ Created by [**Paul Hallett**](https://github.com/phalt) and other [**PokéAPI co
 
 # Railway Production Configuration
 RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT')
+PORT = os.environ.get('PORT')  # Railway sets PORT environment variable
 
 print(f"🔍 Environment check:")
 print(f"   DATABASE_URL exists: {bool(DATABASE_URL)}")
 print(f"   RAILWAY_ENVIRONMENT: {RAILWAY_ENVIRONMENT}")
+print(f"   PORT: {PORT}")
 
-# If DATABASE_URL exists (Railway detected), apply production settings
-if DATABASE_URL:
+# Detect Railway by RAILWAY_ENVIRONMENT or PORT (Railway always sets PORT)
+IS_RAILWAY = RAILWAY_ENVIRONMENT or PORT
+
+if IS_RAILWAY:
     print("🚂 Railway detected - applying production settings")
 
     # Production settings override
@@ -282,24 +286,39 @@ if DATABASE_URL:
     ALLOWED_HOSTS = [
         '.railway.app',
         '.up.railway.app',
+        'healthcheck.railway.app',  # Required for Railway health checks
         'localhost',
         '127.0.0.1'
     ]
 
-    # Optimize database connections for Railway's memory limits
-    DATABASES['default']['CONN_MAX_AGE'] = 60
-    DATABASES['default']['OPTIONS'] = {
-        'MAX_CONNS': 1
-    }
+    # Only optimize database if DATABASE_URL exists
+    if DATABASE_URL:
+        # Optimize database connections for Railway's memory limits
+        DATABASES['default']['CONN_MAX_AGE'] = 60
+        DATABASES['default']['OPTIONS'] = {
+            'MAX_CONNS': 1
+        }
+        print(f"✅ Railway PostgreSQL configuration:")
+        print(f"   Host: {DATABASES['default']['HOST']}")
+        print(f"   Port: {DATABASES['default']['PORT']}")
+        print(f"   Database: {DATABASES['default']['NAME']}")
+        print(f"   User: {DATABASES['default']['USER']}")
+    else:
+        print("⚠️  DATABASE_URL missing - PostgreSQL service not connected")
+        print("   Add PostgreSQL service in Railway dashboard")
+        print("   Railway will auto-create DATABASE_URL environment variable")
 
-    print(f"✅ Railway configuration applied:")
-    print(f"   Host: {DATABASES['default']['HOST']}")
-    print(f"   Port: {DATABASES['default']['PORT']}")
-    print(f"   Database: {DATABASES['default']['NAME']}")
-    print(f"   User: {DATABASES['default']['USER']}")
+        # Use a placeholder database config to prevent crashes
+        # This allows the app to start and show helpful error messages
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': '/tmp/temp.db',  # Temporary SQLite for Railway startup
+            }
+        }
+        print("   Using temporary SQLite database until PostgreSQL is connected")
 else:
     print("⚠️  Railway not detected - using local configuration")
-    print("   Make sure PostgreSQL service is added in Railway dashboard")
 
     # Memory optimizations for Railway
     CACHES = {
@@ -321,6 +340,10 @@ else:
     STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+    # Ensure staticfiles directory exists
+    import pathlib
+    pathlib.Path(STATIC_ROOT).mkdir(parents=True, exist_ok=True)
 
     # Update CORS for Railway domains
     CORS_ALLOWED_ORIGINS = [

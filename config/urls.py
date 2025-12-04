@@ -11,13 +11,16 @@ def api_root(request):
     import os
 
     # Check if we're on Railway
-    is_railway = os.environ.get('RAILWAY_ENVIRONMENT')
+    is_railway = os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('PORT')
+    database_url = os.environ.get('DATABASE_URL')
 
     return JsonResponse({
         'message': 'Welcome to Educational PokéAPI v2 🎓',
         'status': 'healthy',
         'environment': 'Railway' if is_railway else 'Local',
         'debug': settings.DEBUG,
+        'database_connected': bool(database_url),
+        'setup_required': not database_url if is_railway else False,
         'documentation': {
             'swagger_ui': request.build_absolute_uri('/api/v2/schema/swagger-ui/'),
             'redoc': request.build_absolute_uri('/api/v2/schema/redoc/'),
@@ -38,10 +41,24 @@ def api_root(request):
             'OpenAPI 3.1.0 compliant schema',
             'CORS enabled for frontend development',
             'Name and ID-based resource lookup'
-        ]
+        ],
+        'railway_setup': {
+            'postgresql_required': not database_url if is_railway else False,
+            'instructions': 'Add PostgreSQL service in Railway dashboard' if (is_railway and not database_url) else None
+        }
+    })
+
+def health_check(request):
+    """Simple health check for Railway"""
+    return JsonResponse({
+        'status': 'ok',
+        'service': 'educational-pokeapi'
     })
 
 urlpatterns = [
+    # Health check endpoint for Railway
+    url(r'^health/$', health_check, name='health-check'),
+
     # Root endpoint
     url(r'^$', api_root, name='api-root'),
 
